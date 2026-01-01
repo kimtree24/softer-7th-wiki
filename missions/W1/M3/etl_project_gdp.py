@@ -23,8 +23,6 @@ DB_PATH = os.path.join(BASE_DIR, "db", "World_Economies.db")
 RAW_PATH = os.path.join(BASE_DIR, "row_data", "Countries_by_GDP.json")
 # 로그 경로
 LOG_PATH = os.path.join(BASE_DIR, "logs", "etl_project_log.txt")
-# Region 파일 경로
-REGION_JSON_PATH = os.path.join(BASE_DIR, "row_data", "Region_fixed.json")
 
 # 디렉토리 없는 경우 생성
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
@@ -35,25 +33,39 @@ os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
 # 로깅
 # ======================
 
-logging.basicConfig(
-    filename=LOG_PATH,
-    # Info 레벨 이상만 로깅
-    level=logging.INFO,
-    format="%(asctime)s || %(message)s",
-    datefmt="%Y-%B-%d-%H-%M-%S",
-)
-logger = logging.getLogger("etl_logger")
+def setup_logger(log_path, logger_name) -> logging.Logger:
+
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.INFO)
+
+    # 중복 핸들러 방지
+    if logger.handlers:
+        return logger
+
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
+    formatter = logging.Formatter(
+        "%(asctime)s || %(message)s",
+        datefmt="%Y-%B-%d-%H-%M-%S"
+    )
+
+    file_handler = logging.FileHandler(log_path)
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.INFO)
+
+    logger.addHandler(file_handler)
+
+    return logger
 
 # ======================
 # extract
 # ======================
 
-URL = "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_%28nominal%29"
-
-# 헤더 같이 안보내면 스크래핑 불가
-headers = { "User-Agent": "Mozilla/5.0" }
-
 def extract_gdp():
+    URL = "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_%28nominal%29"
+
+    # 헤더 같이 안보내면 스크래핑 불가
+    headers = { "User-Agent": "Mozilla/5.0" }
     
     logger.info("Extract started")
     
@@ -123,12 +135,15 @@ def parse_gdp_and_year(value):
 
     return gdp_billion, year
 
+# transform -> 디비 적재 용이한 형태로 가공
 def transform_gdp():
     logger.info("Transform started")
     
+    # extract한 데이터 파일 읽어오기
     with open(RAW_PATH, "r", encoding="utf-8") as f:
         raw_data = json.load(f)
 
+    # etl 실행한 날짜 DB에 함께 적재하여 관리
     today = date.today().isoformat()
     transformed = []
 
@@ -136,7 +151,8 @@ def transform_gdp():
         # 국가 단위 아닌 것 제거
         if country.lower() == "world":
             continue
-
+        
+        # gdp값과 기준 연도 분리
         gdp_billion, year = parse_gdp_and_year(gdp)
         if gdp_billion is None:
             continue
@@ -157,7 +173,7 @@ def transform_gdp():
 # load
 # ======================
 
-# gdp 데이터 테이블 생성
+# gdp 데이터 테이블 생성 및 적재
 def load_gdp(df):
     logger.info("Load started")
 
@@ -175,9 +191,10 @@ def load_gdp(df):
         )
     """)
 
-    # GDP 기준 정렬 (요구사항)
+    # GDP 기준 정렬
     df = df.sort_values("gdp_usd_billion", ascending=False)
 
+    # 중복되는 값은 무시 (country, year 기준)
     insert_sql = """
         INSERT OR IGNORE INTO Countries_by_GDP
         (country, year, gdp_usd_billion, update_date)
@@ -200,47 +217,19 @@ def load_gdp(df):
 
     logger.info(f"Load finished - attempted {len(data)} rows")
 
-# region 데이터 테이블에 적재
-def load_region():
-    logger.info("Region Load started")
 
-    with open(REGION_JSON_PATH, "r", encoding="utf-8") as f:
-        region_data = json.load(f)
-
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS Region (
-            country TEXT PRIMARY KEY,
-            region TEXT
-        )
-    """)
-
-    insert_sql = """
-        INSERT OR REPLACE INTO Region (country, region)
-        VALUES (?, ?)
-    """
-
-    # world는 null이라서 제외
-    data = [
-        (country, region)
-        for country, region in region_data.items()
-        if country.lower() != "world"
-    ]
-
-    cursor.executemany(insert_sql, data)
-    conn.commit()
-    conn.close()
-
-    logger.info(f"Region Load finished - {len(data)} rows")
-    
 # ======================
 # main
 # ======================
 if __name__ == "__main__":
-    extract_gdp()
-    df = transform_gdp()
-    load_gdp(df)
+    # 로깅 모듈 설정
+    logger = setup_logger(LOG_PATH, "etl_logger")
     
-    load_region()
+    # extract
+    extract_gdp()
+    
+    # transform
+    df = transform_gdp()
+    
+    # load
+    load_gdp(df)
