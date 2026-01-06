@@ -1,0 +1,27 @@
+# Base Image
+FROM jupyter/base-notebook:python-3.10
+
+# 작업 디렉토리
+WORKDIR /home/jovyan/work
+
+# 필요한 Python 패키지 설치
+RUN pip install --no-cache-dir \
+    pandas \
+    numpy \
+    matplotlib \
+    wordcloud \
+    jupyterlab
+
+# 노트북 복사
+COPY notebooks ./notebooks
+
+# 데이터 복사
+COPY data ./data
+
+# 권한 설정 (노트북 저장/실행 필수)
+USER root
+RUN chown -R jovyan:users /home/jovyan/work
+USER jovyan
+
+# JupyterLab 실행
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--ServerApp.token=", "--ServerApp.password="]
