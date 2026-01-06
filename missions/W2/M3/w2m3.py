@@ -1,6 +1,6 @@
 from multiprocessing import Queue
 
-def push(q):
+def push(q, colors):
     print("pushing items to queue:")
     for i, color in enumerate(colors, start=1):
         q.put(color)
@@ -27,5 +27,5 @@ if __name__ == "__main__":
     # queue 생성
     q = Queue()
     
-    push(q)
+    push(q, colors)
     pop(q)
