@@ -1,27 +1,32 @@
-# Base Image
-FROM jupyter/base-notebook:python-3.10
+FROM python:3.10-slim
 
-# 작업 디렉토리
-WORKDIR /home/jovyan/work
+# 기본 환경 변수
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# 필요한 Python 패키지 설치
+WORKDIR /app
+
+# 시스템 패키지 (matplotlib 필수)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 패키지 설치
 RUN pip install --no-cache-dir \
+    jupyterlab \
     pandas \
     numpy \
     matplotlib \
-    wordcloud \
-    jupyterlab
+    wordcloud
 
-# 노트북 복사
+# 노트북 & 데이터 복사
 COPY notebooks ./notebooks
-
-# 데이터 복사
 COPY data ./data
 
-# 권한 설정 (노트북 저장/실행 필수)
-USER root
-RUN chown -R jovyan:users /home/jovyan/work
-USER jovyan
+EXPOSE 8888
 
-# JupyterLab 실행
-CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--ServerApp.token=", "--ServerApp.password="]
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--ServerApp.token=", "--ServerApp.password="]
