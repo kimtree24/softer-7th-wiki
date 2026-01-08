@@ -1,10 +1,4 @@
-# * 팀 미션 / 팀원 소개
-## (1) 개요
-본 프로젝트는 softeer-bootcamp data-engineering W2 Team mission 입니다.
-
-## (2) 팀 / 작성자
-Team2 김태진 장현우 황인제
-
+# * Team2 김태진 장현우 황인제
 # * W2M5
 
 # 1. 주제
