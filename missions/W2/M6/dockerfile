@@ -7,9 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 # 시스템 패키지 (matplotlib 필수)
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libglib2.0-0 \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libsm6 \
     libxext6 \
     libxrender1 \
