@@ -83,5 +83,179 @@ Docker Desktop은 도구이고, Dockerfile은 설계도이며, docker build 명�
 COPY data ./data
 ```
 
-### 소결
+### 5.4 소결
 - Docker Image는 코드 + 데이터 + 실행 환경을 함께 묶는 단위
+
+## 6. AWS ECR & EC2 기반 Docker Image 배포 과정에서의 학습
+
+### 6.1 Docker Image와 ECR의 관계 이해
+
+#### 6.1.1 ECR의 역할
+- Amazon ECR(Elastic Container Registry) 는 Docker Image를 저장하는 사설 이미지 레지스트리
+- Docker Hub와 동일한 역할이지만 AWS 계정 단위로 접근 제어 가능, IAM 권한 기반 인증, EC2, ECS, EKS와 자연스럽게 연동
+
+#### 6.1.2 기본 흐름 정리
+
+```
+Local Docker Image
+   ↓ (docker tag)
+ECR Repository
+   ↓ (docker push / pull)
+EC2 Docker Container 실행
+```
+
+- 즉, 이미지는 로컬에서 빌드, 배포 및 공유는 ECR, 실행은 EC2
+
+### 6.2 ECR Repository 설정 관련 질문과 이해
+
+#### 6.2.1 Image Tag 설정 (Mutable vs Immutable)
+- Mutable: 동일한 tag(latest)에 이미지 덮어쓰기 가능
+- Immutable: 한 번 push한 tag는 변경 불가 / 운영 환경에서 안정성 확보 목적
+
+### 6.3 AWS 인증(Authentication)에 대한 이해
+
+#### 6.3.1 aws ecr login 필요한 이유
+- ECR은 공개 레지스트리 X
+- Docker가 이미지를 push/pull 하려면 AWS 인증 토큰 필요
+
+```
+aws ecr get-login-password --region ap-northeast-2 \
+| docker login --username AWS --password-stdin <account>.dkr.ecr.ap-northeast-2.amazonaws.com
+```
+
+
+### 6.4 User-data 관련 시행착오
+
+#### 6.4.1 Amazon Linux 2023 vs Amazon Linux 2
+
+문제 상황
+	•	Amazon Linux 2023에서
+```
+amazon-linux-extras install docker
+```
+명령어가 동작하지 않음
+
+원인: amazon-linux-extras는 Amazon Linux 2 전용
+결론: user-data를 Amazon Linux 2023 버전으로 수정
+
+### 6.5 Local ↔ EC2 아키텍처 차이 문제
+
+#### 6.6.1 플랫폼 불일치 경고
+
+```
+requested image's platform (linux/arm64) does not match host (linux/amd64)
+```
+
+원인
+- 로컬: Apple Silicon (ARM64)
+- EC2: x86_64 (amd64)
+
+해결 방법
+
+```
+docker buildx build --platform linux/amd64 -t data-product .
+```
+
+# 컨테이너 오케스트레이션 & Kubernetes 정리
+
+## 1. 컨테이너 오케스트레이션이란
+
+- 컨테이너(Docker 등)를 여러 대의 서버(노드)에 걸쳐 자동으로 배치, 실행, 복구, 확장, 배포, 네트워킹, 모니터링 해주는 운영 자동화 시스템이다.
+- 단일 서버에서 컨테이너를 실행하는 수준을 넘어, 서비스 단위의 안정적인 운영을 가능하게 한다.
+
+## 2. 왜 컨테이너 오케스트레이션이 필요한가
+
+### 2.1 docker run만으로 가능한 범위
+- EC2 한 대
+- 컨테이너 1~2개
+- 수동 배포 / 수동 관리
+
+### 2.2 서비스 규모가 커질 때 발생하는 문제
+
+서비스가 커지면 다음과 같은 운영 문제가 발생한다.
+
+	•	서버 증가
+	•		“어느 서버에 어떤 컨테이너가 떠 있지?”
+	•	장애 발생
+	•		“죽은 컨테이너를 자동으로 살려야 함”
+	•	트래픽 급증
+	•		“컨테이너 개수를 자동으로 늘려야 함”
+	•	배포
+	•		“서비스 중단 없이 버전 교체(롤링 업데이트)”
+	•	네트워킹 / 로드밸런싱
+	•		“여러 컨테이너를 하나의 주소로 묶고 트래픽 분산”
+	•	설정 / 비밀키 관리
+	•		“환경변수·토큰·비밀번호를 안전하게 배포”
+	•	로그 / 모니터링
+	•		“문제가 발생한 위치를 중앙에서 추적”
+
+이 모든 문제를 표준화된 방식으로 자동 처리해 주는 것이 컨테이너 오케스트레이션.
+
+## 3. Kubernetes 핵심 개념
+
+### 3.1 클러스터 (Cluster)
+	•	여러 서버(노드)를 하나로 묶은 관리 단위
+	•	쿠버네티스는 클러스터 단위로 동작
+
+### 3.2 노드 (Node)
+	•	실제로 컨테이너가 실행되는 서버 (EC2 등)
+	•	일반적으로: Control Plane Node (관리) / Worker Node (실행)
+	•	사용자는 “여러 서버 묶음” 정도로 이해해도 충분
+
+
+### 3.3 파드 (Pod)
+	•	쿠버네티스의 배포·스케줄링 최소 단위
+	•	보통: 컨테이너 1개 = 파드 1개
+	•	경우에 따라: 강결합된 컨테이너 여러 개를 한 파드에 포함 (예: 앱 + 로그 수집 사이드카)
+
+### 3.4 디플로이먼트 (Deployment)
+	•	“파드를 몇 개 유지하고, 어떻게 배포할지”를 정의
+	•	주요 기능:
+		•	Replica 유지: 항상 N개 유지
+		•	Rolling Update: 무중단 배포
+		•	Rollback: 문제 발생 시 이전 버전 복구
+
+### 3.5 서비스 (Service)
+	•	파드는 재생성될 때마다 IP가 바뀜
+	•	Service는 여러 파드를 하나의 고정된 접근 주소로 묶음
+	•	내부 로드밸런싱 제공
+
+### 3.6 인그레스 (Ingress)
+	•	HTTP/HTTPS 레벨의 트래픽 라우팅
+	•	예시: 
+		example.com/api → API 서비스
+		example.com/web → 웹 서비스
+
+### 3.7 ConfigMap / Secret
+	•	ConfigMap: 일반 설정 값 (환경변수 등)
+	•	Secret: 비밀번호, 토큰 같은 민감 정보
+
+코드나 이미지에 직접 포함하지 않고 안전하게 주입
+
+### 3.8 HPA (Horizontal Pod Autoscaler)
+	•	CPU / 메모리 / 커스텀 메트릭 기반
+	•	파드 개수를 자동으로 확장, 축소
+	•	트래픽 증가 시 자동 scale-out의 핵심 기능
+
+## 4. Kubernetes가 자동으로 해주는 것
+
+### 4.1 스케줄링 (Scheduling)
+	•	어떤 파드를 어떤 노드에 띄울지 자동 결정
+	•	고려 요소
+		CPU / 메모리
+		노드 라벨 
+		제약 조건(taint / toleration)
+
+### 4.2 셀프 힐링 (Self-healing)
+	•	컨테이너 죽음 → 재시작
+	•	파드 죽음 → 재생성
+	•	노드 죽음 → 다른 노드로 재배치
+	•	헬스 체크(Probe) 기반 이상 감지
+
+### 4.3 오토스케일링 (Auto-scaling)
+	•	파드 단위: HPA
+	•	노드 단위: Cluster Autoscaler
+
+### 4.4 무중단 배포 (Rolling Update)
+	•	새 버전 파드를 점진적으로 늘리고 기존 버전 파드를 점진적으로 제거
+	•	서비스 중단 없이 배포 가능

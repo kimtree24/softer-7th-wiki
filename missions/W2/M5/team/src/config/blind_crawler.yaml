@@ -1,0 +1,6 @@
+url: "https://www.teamblind.com/kr/search/상견례+식당"
+max_scroll: 20
+scroll_pause_time: 1.2
+data_path: "../../data/raw/blind_posts.csv"
+encoding: "utf-8-sig"
+log_path: "../../logs/blind_crawler_log.txt"

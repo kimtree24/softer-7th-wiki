@@ -1,0 +1,13 @@
+selenium
+webdriver-manager
+pandas
+PyYAML
+beautifulsoup4
+readability-lxml
+requests
+python-dotenv
+playwright
+wordcloud
+kiwipiepy
+matplotlib
+ko-ww-stopwords
