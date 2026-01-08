@@ -43,28 +43,45 @@ User-data는 EC2 인스턴스가 최초 생성 및 부팅 시 자동으로 실�
 Docker Desktop은 도구이고, Dockerfile은 설계도이며, docker build 명령으로 실제 이미지를 생성한다.
 
 ## 3. OS Base Image 선택 과정
-- 작성예정
+### 3.1 후보군 검토
+- ubuntu:20.04
+- python:3.10
+- python:3.10-slim
+- jupyter/base-notebook
 
-## 4. 패키지 설치 (수정 예정)
+### 3.2 선택 기준
+- ubuntu 계열은 Python 및 패키지를 직접 설치해야 하며 이미지 크기가 큼
+- jupyter/base-notebook은 편리하지만 이미지 크기가 과도하게 큼
+- python:3.10은 안정적이나 불필요한 구성 요소가 포함됨
 
-W1, W2에서 작성한 노트북을 분석한 결과 다음 라이브러리가 필요했다.
-	•	pandas
-	•	numpy
-	•	matplotlib
-	•	wordcloud
-	•	jupyterlab
+### 3.3 최종 선택 - python:3.10-slim
+- Python 실행 환경이 이미 구성되어 있고 slim 버전으로 불필요한 패키지가 제거되어 이미지 크기가 작음
+- 필요한 라이브러리만 명시적으로 설치 가능
+- 필요한 것만 얹어 쓰는 이미지 라는 Docker 철학에 가장 부합
 
-배운 점
-	•	--no-cache-dir 옵션으로 이미지 용량 최소화
-	•	분석에 필요한 라이브러리만 명시적으로 설치하는 것이 중요
+## 4. 패키지 설치
+- pip install --no-cache-dir 옵션을 사용하면 pip 캐시가 이미지에 남지 않아 용량을 크게 줄일 수 있음
+- 불필요한 패키지를 줄이는 것이 곧 이미지 최적화로 이어짐. 따라서 실제로 import한 패키지만 명시하여 설치
 
 ⸻
 
-## 5. 어떤 파일을 Docker Image에 담아야 했는가? (수정 예정)
+## 5. 어떤 파일을 Docker Image에 담아야 했는가?
+### 5.1 초기 문제 상황
+- 초기에는 Jupyter Notebook 파일만 Docker Image에 포함
+	```
+	FileNotFoundError: data/W1/mtcars.csv
+	```
+### 5.2 문제 원인 분석
+- 노트북은 단독으로 실행되는 코드가 아니라 외부 데이터 파일에 의존하는 실행 단위
+- Docker 컨테이너 내부에는 해당 데이터 파일이 존재하지 않았음
 
-처음에는 노트북만 복사했지만, 실행 중 다음 문제가 발생했다.
-FileNotFoundError: data/W1/mtcars.csv
+### 5.3 해결 방법
 
-이를 통해 깨달은 점은:
+노트북이 참조하는 데이터 디렉토리 전체를 Docker Image에 포함
 
-노트북이 의존하는 데이터 파일도 반드시 이미지에 포함되어야 한다
+```
+COPY data ./data
+```
+
+### 소결
+- Docker Image는 코드 + 데이터 + 실행 환경을 함께 묶는 단위
