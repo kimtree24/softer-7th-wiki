@@ -1,0 +1,23 @@
+<!--“HDFS가 데이터를 어디에, 몇 개로 나눠 저장할지”-->
+
+<configuration>
+    <!-- HDFS가 파일 블록을 몇 개 복제해서 저장할지 정하는 기본값 -->
+  <property>
+    <name>dfs.replication</name>
+    <value>1</value>
+  </property>
+
+    <!-- NameNode는 메타데이터를 저장하는 로컬 디렉토리 경로 (컨테이너 기준 로컬) -->
+    <!-- fsimage(파일시스템 스냅샷), edits(트랜잭션 로그) -->
+    <!-- 호스트 디스크에는 volumes/name에 연결할거임 -->
+  <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>/hadoop/dfs/name</value>
+  </property>
+
+    <!-- 호스트 디스크에는 volumes/data에 연결할거임 -->
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>/hadoop/dfs/data</value>
+  </property>
+</configuration>

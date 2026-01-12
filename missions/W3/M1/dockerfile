@@ -1,0 +1,54 @@
+# Hadoop 환경 구성
+FROM ubuntu:22.04
+
+# 1. 필수 패키지
+RUN apt-get update && apt-get install -y \
+    # 하둡은 자바 기반
+    openjdk-11-jdk \
+    # 하둡 다운로드에 필요
+    wget \
+    # 하둡 노드간 ssh 통신 필요 (NameNode -> DataNode)
+    ssh \
+    # 파일, 설정, 로그 등을 노드 간 동기화할 때 사용
+    rsync \
+    # 디버깅용 -> 컨테이너 안에서 확인 및 수정
+    vim \
+    # 네트워크 상태 확인용 -> HDFS 웹 UI 포트 열렸는지 확인용
+    net-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. Hadoop 다운로드
+ENV HADOOP_VERSION=3.3.6
+RUN wget https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
+    tar -xzf hadoop-${HADOOP_VERSION}.tar.gz && \
+    mv hadoop-${HADOOP_VERSION} /usr/local/hadoop && \
+    rm hadoop-${HADOOP_VERSION}.tar.gz
+
+# 3. 환경 변수
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV HADOOP_HOME=/usr/local/hadoop
+ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+
+# 4. SSH 설정 (Hadoop 내부 통신용)
+RUN ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa && \
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
+    chmod 600 ~/.ssh/authorized_keys
+
+# 5. Hadoop 설정 복사
+COPY core-site.xml $HADOOP_HOME/etc/hadoop/
+COPY hdfs-site.xml $HADOOP_HOME/etc/hadoop/
+COPY mapred-site.xml $HADOOP_HOME/etc/hadoop/
+
+# 6. 데이터 디렉토리 생성
+RUN mkdir -p /hadoop/dfs/name /hadoop/dfs/data
+
+# 7. 엔트리포인트
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# 9870은 웹 UI 포트
+# 9000은 HDFS 통신 포트
+EXPOSE 9870 9000
+
+# 컨테이너 실행시 해당 sh 실행됨
+ENTRYPOINT ["/entrypoint.sh"]
