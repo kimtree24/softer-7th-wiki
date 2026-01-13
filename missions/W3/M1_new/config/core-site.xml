@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<configuration>
+  <!-- HDFS 접속 주소 (RPC) -->
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://localhost:9000</value>
+  </property>
+
+  <!-- 임시 디렉토리 -->
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value>/tmp/hadoop-${user.name}</value>
+  </property>
+</configuration>

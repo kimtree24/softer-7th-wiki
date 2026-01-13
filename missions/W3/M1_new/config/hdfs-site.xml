@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<configuration>
+  <!-- 단일 노드라 replication=1 -->
+  <property>
+    <name>dfs.replication</name>
+    <value>1</value>
+  </property>
+
+  <!-- NameNode / DataNode 데이터 디렉토리 (영속 볼륨) -->
+  <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>file:/hadoop/dfs/namenode</value>
+  </property>
+
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>file:/hadoop/dfs/datanode</value>
+  </property>
+
+  <!-- Web UI -->
+  <property>
+    <name>dfs.namenode.http-address</name>
+    <value>0.0.0.0:9870</value>
+  </property>
+
+  <property>
+    <name>dfs.datanode.http.address</name>
+    <value>0.0.0.0:9864</value>
+  </property>
+</configuration>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<configuration>
+  <!-- NodeManager가 mapreduce shuffle 제공 -->
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+  </property>
+
+  <!-- ResourceManager UI -->
+  <property>
+    <name>yarn.resourcemanager.webapp.address</name>
+    <value>0.0.0.0:8088</value>
+  </property>
+</configuration>
