@@ -15,16 +15,16 @@
     <value>/hadoop/dfs/data</value>
   </property>
 
-  
+  <!-- Docker 환경에서 DataNode가 hostname으로 자신을 광고하게 함 -->
   <property>
     <name>dfs.datanode.use.datanode.hostname</name>
     <value>true</value>
   </property>
 
-  
+  <!-- Client도 hostname으로 DataNode에 접속 -->
   <property>
     <name>dfs.client.use.datanode.hostname</name>
     <value>true</value>
   </property>
 
-<property><name>dfs.blocksize</name><value>134217728</value></property></configuration>
+</configuration>
