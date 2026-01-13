@@ -1,5 +1,6 @@
 <configuration>
   <property>
+    <!-- hdfs dfs -ls 를 실행했을 때 어디로 접속할지 결정 -->
     <name>fs.defaultFS</name>
     <value>hdfs://master:9000</value>
   </property>
