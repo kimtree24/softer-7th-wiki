@@ -17,6 +17,8 @@ RUN apt-get update && apt-get install -y \
     net-tools \
     && rm -rf /var/lib/apt/lists/*
 
+RUN ln -sf /bin/bash /bin/sh
+
 # 2. Hadoop 다운로드
 ENV HADOOP_VERSION=3.3.6
 RUN wget https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz && \
@@ -28,6 +30,11 @@ RUN wget https://downloads.apache.org/hadoop/common/hadoop-${HADOOP_VERSION}/had
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV HADOOP_HOME=/usr/local/hadoop
 ENV PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+
+# Hadoop 데몬 사용자
+ENV HDFS_NAMENODE_USER=hdfs
+ENV HDFS_DATANODE_USER=hdfs
+ENV HDFS_SECONDARYNAMENODE_USER=hdfs
 
 # 4. SSH 설정 (Hadoop 내부 통신용)
 RUN ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa && \
@@ -42,6 +49,14 @@ COPY mapred-site.xml $HADOOP_HOME/etc/hadoop/
 # 6. 데이터 디렉토리 생성
 RUN mkdir -p /hadoop/dfs/name /hadoop/dfs/data
 
+# 6-1. Hadoop 전용 사용자 생성
+RUN useradd -m hdfs && \
+    chown -R hdfs:hdfs /usr/local/hadoop /hadoop
+
+RUN echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64' >> /home/hdfs/.bashrc && \
+    echo 'export HADOOP_HOME=/usr/local/hadoop' >> /home/hdfs/.bashrc && \
+    echo 'export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin' >> /home/hdfs/.bashrc
+
 # 7. 엔트리포인트
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -51,4 +66,4 @@ RUN chmod +x /entrypoint.sh
 EXPOSE 9870 9000
 
 # 컨테이너 실행시 해당 sh 실행됨
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

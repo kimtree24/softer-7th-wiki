@@ -19,7 +19,7 @@ service ssh start
 
 # HDFS 시작 / NameNode + DataNode 실행
 echo "Starting HDFS..."
-start-dfs.sh
+$HADOOP_HOME/sbin/start-dfs.sh
 
 # 웹 UI 로그 보기용
 tail -f $HADOOP_HOME/logs/*
