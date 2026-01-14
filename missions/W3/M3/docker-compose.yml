@@ -7,7 +7,10 @@ services:
       - "9870:9870"
       - "8088:8088"
     volumes:
+      - ./config:/opt/hadoop/etc/hadoop
       - ./data/namenode:/hadoop/dfs/name
+      - ./src:/src
+      - ./data:/data
     networks:
       - hadoop-net
 
@@ -16,6 +19,7 @@ services:
     container_name: worker1
     hostname: worker1
     volumes:
+      - ./config:/opt/hadoop/etc/hadoop
       - ./data/datanode1:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -25,6 +29,7 @@ services:
     container_name: worker2
     hostname: worker2
     volumes:
+      - ./config:/opt/hadoop/etc/hadoop
       - ./data/datanode2:/hadoop/dfs/data
     networks:
       - hadoop-net

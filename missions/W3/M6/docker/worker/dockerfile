@@ -1,0 +1,8 @@
+FROM hadoop-base
+
+ENV HADOOP_ROLE=worker
+
+COPY scripts/start-hadoop.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]

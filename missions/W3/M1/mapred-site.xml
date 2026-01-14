@@ -1,8 +1,0 @@
-<!--MapReduce가 Local이 아니라 Hadoop 방식으로 돌도록 설정-->
-
-<configuration>
-  <property>
-    <name>mapreduce.framework.name</name>
-    <value>yarn</value>
-  </property>
-</configuration>

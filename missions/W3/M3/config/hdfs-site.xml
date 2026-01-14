@@ -1,0 +1,30 @@
+<configuration>
+
+  <property>
+    <name>dfs.replication</name>
+    <value>2</value>
+  </property>
+
+  <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>/hadoop/dfs/name</value>
+  </property>
+
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>/hadoop/dfs/data</value>
+  </property>
+
+  <!-- Docker 환경에서 DataNode가 hostname으로 자신을 광고하게 함 -->
+  <property>
+    <name>dfs.datanode.use.datanode.hostname</name>
+    <value>true</value>
+  </property>
+
+  <!-- Client도 hostname으로 DataNode에 접속 -->
+  <property>
+    <name>dfs.client.use.datanode.hostname</name>
+    <value>true</value>
+  </property>
+
+</configuration>

@@ -1,0 +1,89 @@
+services:
+  master:
+    image: hadoop-master
+    container_name: master
+    hostname: master
+    ports:
+      - "9870:9870"
+      - "8088:8088"
+    volumes:
+      - ./data/namenode:/hadoop/dfs/name
+      - ./src:/src
+      - ./data:/data
+    networks:
+      - hadoop-net
+
+  worker1:
+    image: hadoop-worker
+    container_name: worker1
+    hostname: worker1
+    volumes:
+      - ./data/datanode1:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker2:
+    image: hadoop-worker
+    container_name: worker2
+    hostname: worker2
+    volumes:
+      - ./data/datanode2:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker3:
+    image: hadoop-worker
+    container_name: worker3
+    hostname: worker3
+    volumes:
+      - ./data/datanode3:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker4:
+    image: hadoop-worker
+    container_name: worker4
+    hostname: worker4
+    volumes:
+      - ./data/datanode4:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker5:
+    image: hadoop-worker
+    container_name: worker5
+    hostname: worker5
+    volumes:
+      - ./data/datanode5:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker6:
+    image: hadoop-worker
+    container_name: worker6
+    hostname: worker6
+    volumes:
+      - ./data/datanode6:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker7:
+    image: hadoop-worker
+    container_name: worker7
+    hostname: worker7
+    volumes:
+      - ./data/datanode7:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker8:
+    image: hadoop-worker
+    container_name: worker8
+    hostname: worker8
+    volumes:
+      - ./data/datanode8:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+networks:
+  hadoop-net:
