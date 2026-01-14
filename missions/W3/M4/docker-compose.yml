@@ -7,10 +7,14 @@ services:
       - "9870:9870"
       - "8088:8088"
     volumes:
-      - ./config:/opt/hadoop/etc/hadoop
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/namenode:/hadoop/dfs/name
+      - ./data/twitter.csv:/data/twitter.csv
       - ./src:/src
-      - ./data:/data
     networks:
       - hadoop-net
 
@@ -19,7 +23,11 @@ services:
     container_name: worker1
     hostname: worker1
     volumes:
-      - ./config:/opt/hadoop/etc/hadoop
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode1:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -29,7 +37,11 @@ services:
     container_name: worker2
     hostname: worker2
     volumes:
-      - ./config:/opt/hadoop/etc/hadoop
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode2:/hadoop/dfs/data
     networks:
       - hadoop-net
