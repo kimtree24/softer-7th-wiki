@@ -24,8 +24,6 @@ RUN ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa && \
 
 RUN echo "export JAVA_HOME=$JAVA_HOME" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
 
-COPY config/* $HADOOP_HOME/etc/hadoop/
-
 RUN mkdir -p /hadoop/dfs/name /hadoop/dfs/data
 
 ENV HDFS_NAMENODE_USER=root

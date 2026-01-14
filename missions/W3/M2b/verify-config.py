@@ -8,13 +8,13 @@ CHECKS = [
     ("hdfs", "dfs.blocksize", "134217728"),
     ("hdfs", "dfs.namenode.name.dir", "/hadoop/dfs/name"),
 
-    ("hdfs", "mapreduce.framework.name", "yarn"),
-    ("hdfs", "mapreduce.jobhistory.address", "namenode:10020"),
-    ("hdfs", "mapreduce.task.io.sort.mb", "256"),
+    ("hadoop", "mapreduce.framework.name", "yarn"),
+    ("hadoop", "mapreduce.jobhistory.address", "namenode:10020"),
+    ("hadoop", "mapreduce.task.io.sort.mb", "256"),
 
-    ("hdfs", "yarn.resourcemanager.address", "namenode:8032"),
-    ("hdfs", "yarn.nodemanager.resource.memory-mb", "8192"),
-    ("hdfs", "yarn.scheduler.minimum-allocation-mb", "1024"),
+    ("yarn", "yarn.resourcemanager.address", "namenode:8032"),
+    ("yarn", "yarn.nodemanager.resource.memory-mb", "8192"),
+    ("yarn", "yarn.scheduler.minimum-allocation-mb", "1024"),
 ]
 
 
@@ -26,6 +26,8 @@ def getconf(cmd, key):
 
 
 def main():
+    print("=== Verifying Hadoop Configuration ===")
+
     for tool, key, expected in CHECKS:
         actual = getconf(tool, key)
         if actual == expected:
@@ -33,16 +35,17 @@ def main():
         else:
             print(f"FAIL: [{tool} getconf {key}] -> {actual} (expected {expected})")
 
-    print("Testing HDFS replication...")
+    print("\n=== Testing HDFS Replication ===")
+
     subprocess.run([
-    "docker", "exec", "master", "bash", "-c",
-    """
-    echo testdata > /tmp/test.txt
-    hdfs dfs -rm -r -f /rep_test
-    hdfs dfs -mkdir /rep_test
-    hdfs dfs -put /tmp/test.txt /rep_test/test.txt
-    """
-])
+        "docker", "exec", "master", "bash", "-c",
+        """
+        echo testdata > /tmp/test.txt
+        hdfs dfs -rm -r -f /rep_test
+        hdfs dfs -mkdir /rep_test
+        hdfs dfs -put /tmp/test.txt /rep_test/test.txt
+        """
+    ], check=True)
 
     rep = subprocess.check_output(
         ["docker", "exec", "master", "hdfs", "dfs", "-stat", "%r", "/rep_test/test.txt"],

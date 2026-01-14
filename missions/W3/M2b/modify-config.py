@@ -2,8 +2,9 @@ import shutil
 import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import sys
 
-CONFIG_DIR = Path("config")
+CONFIG_DIR = Path(sys.argv[1])
 BACKUP_DIR = Path("config_backup")
 
 SETTINGS = {
@@ -29,63 +30,42 @@ SETTINGS = {
     }
 }
 
-
-def modify_xml(file_path, updates):
-    tree = ET.parse(file_path)
+def modify_xml(path, updates):
+    tree = ET.parse(path)
     root = tree.getroot()
 
-    for key, value in updates.items():
+    for k, v in updates.items():
         found = False
         for prop in root.findall("property"):
-            if prop.find("name").text == key:
-                prop.find("value").text = value
+            if prop.find("name").text == k:
+                prop.find("value").text = v
                 found = True
-                break
-
         if not found:
-            prop = ET.SubElement(root, "property")
-            ET.SubElement(prop, "name").text = key
-            ET.SubElement(prop, "value").text = value
+            p = ET.SubElement(root, "property")
+            ET.SubElement(p, "name").text = k
+            ET.SubElement(p, "value").text = v
 
-    tree.write(file_path)
-    print(f"  ✔ Modified {file_path.name}")
-
+    tree.write(path)
 
 def main():
-    print("=== Hadoop Configuration Modification ===")
-
-    if not CONFIG_DIR.exists():
-        print("ERROR: config directory not found")
-        return
-
     BACKUP_DIR.mkdir(exist_ok=True)
 
-    # 1️⃣ Backup
-    for file in SETTINGS:
-        src = CONFIG_DIR / file
-        dst = BACKUP_DIR / file
+    print("Backing up config files...")
+    for f in SETTINGS:
+        shutil.copy(CONFIG_DIR / f, BACKUP_DIR / f)
 
-        if not src.exists():
-            print(f"ERROR: {file} not found")
-            return
+    print("Modifying XML files...")
+    for f, updates in SETTINGS.items():
+        modify_xml(CONFIG_DIR / f, updates)
+        print(f"  Modified {f}")
 
-        shutil.copy(src, dst)
-        print(f"Backup created: {dst}")
+    print("\nRestarting Hadoop services...")
+    subprocess.run([
+        "docker", "exec", "master", "bash", "-c",
+        "stop-dfs.sh && stop-yarn.sh && start-dfs.sh && start-yarn.sh"
+    ], check=True)
 
-    # 2️⃣ Modify XML
-    for file, updates in SETTINGS.items():
-        print(f"Modifying {file}")
-        modify_xml(CONFIG_DIR / file, updates)
-
-    # 3️⃣ Restart Hadoop cluster
-    print("\nStopping Hadoop cluster...")
-    subprocess.run(["docker-compose", "down"], check=True)
-
-    print("Starting Hadoop cluster...")
-    subprocess.run(["docker-compose", "up", "-d"], check=True)
-
-    print("\nConfiguration changes applied and Hadoop restarted successfully.")
-
+    print("\nConfiguration applied and Hadoop restarted")
 
 if __name__ == "__main__":
     main()
