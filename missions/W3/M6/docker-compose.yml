@@ -7,9 +7,14 @@ services:
       - "9870:9870"
       - "8088:8088"
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/namenode:/hadoop/dfs/name
+      - ./data/amazon:/data/amazon
       - ./src:/src
-      - ./data:/data
     networks:
       - hadoop-net
 
@@ -18,6 +23,11 @@ services:
     container_name: worker1
     hostname: worker1
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode1:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -27,6 +37,11 @@ services:
     container_name: worker2
     hostname: worker2
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode2:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -36,6 +51,11 @@ services:
     container_name: worker3
     hostname: worker3
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode3:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -45,6 +65,11 @@ services:
     container_name: worker4
     hostname: worker4
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode4:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -54,6 +79,11 @@ services:
     container_name: worker5
     hostname: worker5
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode5:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -63,6 +93,11 @@ services:
     container_name: worker6
     hostname: worker6
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode6:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -72,6 +107,11 @@ services:
     container_name: worker7
     hostname: worker7
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode7:/hadoop/dfs/data
     networks:
       - hadoop-net
@@ -81,7 +121,54 @@ services:
     container_name: worker8
     hostname: worker8
     volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
       - ./data/datanode8:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker9:
+    image: hadoop-worker
+    container_name: worker9
+    hostname: worker9
+    volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
+      - ./data/datanode9:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker10:
+    image: hadoop-worker
+    container_name: worker10
+    hostname: worker10
+    volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
+      - ./data/datanode10:/hadoop/dfs/data
+    networks:
+      - hadoop-net
+
+  worker11:
+    image: hadoop-worker
+    container_name: worker11
+    hostname: worker11
+    volumes:
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml
+      - ./config/yarn-site.xml:/opt/hadoop/etc/hadoop/yarn-site.xml
+      - ./config/mapred-site.xml:/opt/hadoop/etc/hadoop/mapred-site.xml
+      - ./config/workers:/opt/hadoop/etc/hadoop/workers
+      - ./data/datanode11:/hadoop/dfs/data
     networks:
       - hadoop-net
 

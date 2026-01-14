@@ -8,13 +8,15 @@ CHECKS = [
     ("hdfs", "dfs.blocksize", "134217728"),
     ("hdfs", "dfs.namenode.name.dir", "/hadoop/dfs/name"),
 
-    ("hadoop", "mapreduce.framework.name", "yarn"),
-    ("hadoop", "mapreduce.jobhistory.address", "namenode:10020"),
-    ("hadoop", "mapreduce.task.io.sort.mb", "256"),
+    # MapReduce
+    ("hdfs", "mapreduce.framework.name", "yarn"),
+    ("hdfs", "mapreduce.jobhistory.address", "namenode:10020"),
+    ("hdfs", "mapreduce.task.io.sort.mb", "256"),
 
-    ("yarn", "yarn.resourcemanager.address", "namenode:8032"),
-    ("yarn", "yarn.nodemanager.resource.memory-mb", "8192"),
-    ("yarn", "yarn.scheduler.minimum-allocation-mb", "1024"),
+    # YARN
+    ("hdfs", "yarn.resourcemanager.address", "namenode:8032"),
+    ("hdfs", "yarn.nodemanager.resource.memory-mb", "8192"),
+    ("hdfs", "yarn.scheduler.minimum-allocation-mb", "1024"),
 ]
 
 

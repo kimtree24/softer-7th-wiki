@@ -11,8 +11,8 @@ HDFS 분산 저장과 YARN 기반 분산 처리를 검증한다.
 ## 1. Docker 이미지 빌드
 ```bash
 docker build -t hadoop-base docker/base
-docker build -t hadoop-master docker/master
-docker build -t hadoop-worker docker/worker
+docker build -t hadoop-master -f docker/master/dockerfile .
+docker build -t hadoop-worker -f docker/worker/dockerfile .
 ```
 
 ---

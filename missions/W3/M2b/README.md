@@ -1,23 +1,6 @@
 # W3 M2b – Hadoop Multi-Node Cluster 설정 자동화 & 검증
 
-본 과제는 Docker 기반 Apache Hadoop 멀티 노드 클러스터에서  
-**설정 변경을 자동화하고, 변경 결과를 검증하는 시스템**을 구현하는 것이 목표입니다.
-
-M2a에서는 Hadoop 클러스터를 구축했고,  
-M2b에서는 그 클러스터의 설정을 **스크립트로 변경 & 검증**하는 과제를 수행합니다.
-
----
-
-## 📌 과제 목표
-
-- Hadoop 멀티 노드 클러스터(Docker 기반) 구성
-- core-site.xml, hdfs-site.xml, mapred-site.xml, yarn-site.xml 설정 자동 수정
-- 수정된 설정이 실제 Hadoop에 반영되었는지 자동 검증
-- 설정 백업, 재시작, 검증을 하나의 자동화 흐름으로 구성
-
----
-
-## 🧩 시스템 구조
+## 시스템 구조
 
 ```
 Mac Host
@@ -41,7 +24,7 @@ Hadoop 설정 디렉토리(`/opt/hadoop/etc/hadoop`)는 Docker 볼륨으로
 
 ---
 
-## ⚙ 설정 변경 대상
+## 설정 변경 대상
 
 | 파일 | 변경 항목 | 값 |
 |------|---------|----|
@@ -60,9 +43,9 @@ Hadoop 설정 디렉토리(`/opt/hadoop/etc/hadoop`)는 Docker 볼륨으로
 
 ---
 
-## 🛠 실행 방법
+## 실행 방법
 
-### 1️⃣ 클러스터 초기 실행
+### 클러스터 초기 실행
 
 ```bash
 docker-compose up -d
@@ -70,7 +53,7 @@ docker-compose up -d
 
 ---
 
-### 2️⃣ 설정 변경 실행
+### 설정 변경 실행
 
 ```bash
 python3 modify-config.py ./config
@@ -83,7 +66,7 @@ python3 modify-config.py ./config
 
 ---
 
-### 3️⃣ 설정 검증 실행
+### 설정 검증 실행
 
 ```bash
 python3 verify-config.py
@@ -95,43 +78,3 @@ python3 verify-config.py
 - 복제 계수 확인
 - MapReduce WordCount 실행 (YARN 사용 여부)
 - ResourceManager 메모리 설정 확인
-
----
-
-## 📊 기대 출력 예시
-
-```
-PASS: [hdfs getconf fs.defaultFS] -> hdfs://namenode:9000
-PASS: [hdfs getconf hadoop.tmp.dir] -> /hadoop/tmp
-PASS: [hdfs getconf io.file.buffer.size] -> 131072
-PASS: [hdfs getconf dfs.replication] -> 2
-PASS: [hdfs getconf dfs.blocksize] -> 134217728
-PASS: [hdfs getconf dfs.namenode.name.dir] -> /hadoop/dfs/name
-PASS: [mapred getconf mapreduce.framework.name] -> yarn
-PASS: [mapred getconf mapreduce.jobhistory.address] -> namenode:10020
-PASS: [mapred getconf mapreduce.task.io.sort.mb] -> 256
-PASS: [yarn getconf yarn.resourcemanager.address] -> namenode:8032
-PASS: [yarn getconf yarn.nodemanager.resource.memory-mb] -> 8192
-PASS: [yarn getconf yarn.scheduler.minimum-allocation-mb] -> 1024
-PASS: Replication factor is 2
-```
-
----
-
-## 📦 제출물
-
-- modify-config.py
-- verify-config.py
-- 원본 config XML
-- 변경된 config XML
-- README_KR.md
-
----
-
-## 🧠 핵심 학습 포인트
-
-- Docker 볼륨을 이용한 Hadoop 설정 외부화
-- XML 기반 Hadoop 설정 자동 수정
-- Hadoop 서비스 재시작 자동화
-- 실제 Hadoop 명령을 이용한 설정 검증
-- 멀티 노드 YARN 기반 MapReduce 실행 확인
