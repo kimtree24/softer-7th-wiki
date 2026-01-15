@@ -2,7 +2,7 @@
 
   <property>
     <name>dfs.replication</name>
-    <value>3</value>
+    <value>1</value>
   </property>
 
   <property>
@@ -25,6 +25,16 @@
   <property>
     <name>dfs.client.use.datanode.hostname</name>
     <value>true</value>
+  </property>
+
+  <property>
+    <name>dfs.client.write.packet.size</name>
+    <value>65536</value>   <!-- 64KB -->
+  </property>
+
+  <property>
+    <name>dfs.datanode.socket.write.timeout</name>
+    <value>300000</value> <!-- 5분 -->
   </property>
 
 </configuration>

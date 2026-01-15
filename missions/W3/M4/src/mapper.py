@@ -26,7 +26,7 @@ def classify(text: str) -> str:
     return "neutral"
 
 for bline in sys.stdin.buffer:
-    # ✅ 깨진 인코딩이 있어도 죽지 않게 처리
+    # 인코딩 깨져도 동작하도록
     line = bline.decode("utf-8", errors="ignore").strip()
     if not line:
         continue
